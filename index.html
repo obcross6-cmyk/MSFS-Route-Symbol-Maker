@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSFS Custom Route Maker</title>
+    <!-- Loads Leaflet CSS for the map styling -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Loads your custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="sidebar">
+        <h2>Route Maker</h2>
+        
+        <div class="control-group">
+            <label for="imageUpload">1. Upload a Stencil Image</label>
+            <p class="helper-text">Upload a shape (like a star or text). Two blue markers will appear—drag them to resize and position your image.</p>
+            <input type="file" id="imageUpload" accept="image/*">
+            <button id="clearImage">Remove Image</button>
+        </div>
+
+        <div class="control-group">
+            <label>2. Plot Your Route</label>
+            <p class="helper-text">Click along the edges of your image on the map to draw your waypoints.</p>
+            <button id="clearRoute">Clear Waypoints</button>
+        </div>
+
+        <div class="control-group">
+            <label for="output">3. SimBrief Export</label>
+            <p class="helper-text">Copy these coordinates into the SimBrief route box.</p>
+            <textarea id="output" rows="6" readonly placeholder="Your generated coordinates will appear here..."></textarea>
+            <button id="copyBtn">Copy to Clipboard</button>
+        </div>
+    </div>
+    
+    <!-- This div holds the interactive map -->
+    <div id="map"></div>
+
+    <!-- Loads Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Loads your custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
