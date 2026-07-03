@@ -1,15 +1,20 @@
-/* Removes default browser margins and makes the app full screen */
+/* Reset everything */
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
+    width: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
     background-color: #121212;
+    overflow: hidden; /* Prevents scrollbars */
 }
 
-/* Sidebar styling for a dark aviation-tool aesthetic */
+/* Force the sidebar to the left */
 #sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
     width: 350px;
     background-color: #1e1e24;
     color: #ffffff;
@@ -18,15 +23,20 @@ body, html {
     display: flex;
     flex-direction: column;
     gap: 25px;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.8);
-    z-index: 1000; /* Keeps the menu above the map */
+    box-shadow: 5px 0 15px rgba(0,0,0,0.9);
+    z-index: 1000; /* Keeps menu above map */
     overflow-y: auto;
 }
 
+/* Force the map to fill the remaining space on the right */
 #map {
-    flex-grow: 1;
-    height: 100%;
-    background-color: #333;
+    position: absolute;
+    left: 350px; /* Starts exactly where sidebar ends */
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #222; /* Dark fallback color */
+    z-index: 1;
 }
 
 h2 {
@@ -47,18 +57,8 @@ h2 {
     border-radius: 8px;
 }
 
-label {
-    font-weight: bold;
-    font-size: 1rem;
-    color: #4da6ff;
-}
-
-.helper-text {
-    font-size: 0.8rem;
-    color: #aaaaaa;
-    margin: 0;
-    line-height: 1.4;
-}
+label { font-weight: bold; color: #4da6ff; }
+.helper-text { font-size: 0.8rem; color: #aaaaaa; margin: 0; }
 
 button, input[type="file"] {
     padding: 10px;
@@ -68,21 +68,11 @@ button, input[type="file"] {
     cursor: pointer;
     border-radius: 4px;
     font-weight: bold;
-    transition: background-color 0.2s;
 }
 
-button:hover {
-    background-color: #3385ff;
-}
-
-#clearImage, #clearRoute {
-    background-color: #ff4d4d;
-    color: white;
-}
-
-#clearImage:hover, #clearRoute:hover {
-    background-color: #cc0000;
-}
+button:hover { background-color: #3385ff; }
+#clearImage, #clearRoute { background-color: #ff4d4d; color: white; }
+#clearImage:hover, #clearRoute:hover { background-color: #cc0000; }
 
 textarea {
     resize: none;
@@ -92,5 +82,5 @@ textarea {
     border-radius: 4px;
     border: 1px solid #555;
     background-color: #1a1a1a;
-    color: #00ff00; /* Green text like an aviation computer */
+    color: #00ff00;
 }
