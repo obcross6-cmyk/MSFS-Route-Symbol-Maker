@@ -1,144 +1,86 @@
-// 1. INITIALIZE THE MAP
-// Centered over the US by default, zoom level 5
-const map = L.map('map').setView([39.8283, -98.5795], 5); 
-
-// Use a dark map theme suitable for aviation
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-
-// 2. IMAGE OVERLAY & RESIZING LOGIC
-let imageOverlay = null;
-let topLeftMarker = null;
-let bottomRightMarker = null;
-let uploadedImageUrl = null;
-
-// Listen for a file upload
-document.getElementById('imageUpload').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Read the file and convert it to a URL the map can display
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        uploadedImageUrl = event.target.result;
-        placeImageOnMap();
-    };
-    reader.readAsDataURL(file);
-});
-
-function placeImageOnMap() {
-    // Clean up old image if one exists
-    if (imageOverlay) map.removeLayer(imageOverlay);
-    if (topLeftMarker) map.removeLayer(topLeftMarker);
-    if (bottomRightMarker) map.removeLayer(bottomRightMarker);
-
-    const center = map.getCenter();
-    
-    // Set initial bounds (size) for the uploaded image based on map center
-    const bounds = [
-        [center.lat + 2, center.lng - 3], // Top Left Corner
-        [center.lat - 2, center.lng + 3]  // Bottom Right Corner
-    ];
-
-    // Add image to map (slightly transparent so you can see map beneath)
-    imageOverlay = L.imageOverlay(uploadedImageUrl, bounds, { opacity: 0.5 }).addTo(map);
-
-    // Create draggable markers to resize the image
-    topLeftMarker = L.marker(bounds[0], { draggable: true, title: 'Drag to resize' }).addTo(map);
-    bottomRightMarker = L.marker(bounds[1], { draggable: true, title: 'Drag to resize' }).addTo(map);
-
-    // Update image size whenever a marker is dragged
-    function updateImageBounds() {
-        const newBounds = L.latLngBounds(topLeftMarker.getLatLng(), bottomRightMarker.getLatLng());
-        imageOverlay.setBounds(newBounds);
-    }
-
-    topLeftMarker.on('drag', updateImageBounds);
-    bottomRightMarker.on('drag', updateImageBounds);
+/* Reset everything */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    overflow: hidden; /* Prevents scrollbars */
 }
 
-
-// 3. ROUTE DRAWING LOGIC
-let routePoints = [];
-const routePolyline = L.polyline([], { color: '#00ff00', weight: 3 }).addTo(map);
-const routeMarkers = L.layerGroup().addTo(map);
-
-// Listen for clicks on the map to draw waypoints
-map.on('click', function(e) {
-    const latlng = e.latlng;
-    
-    // Add point to our list and draw the line
-    routePoints.push(latlng);
-    routePolyline.addLatLng(latlng);
-
-    // Place a small dot on the map where clicked
-    L.circleMarker(latlng, {
-        radius: 4,
-        color: '#fff',
-        fillColor: '#00ff00',
-        fillOpacity: 1
-    }).addTo(routeMarkers);
-
-    // Generate the SimBrief coordinates
-    updateSimBriefOutput();
-});
-
-
-// 4. SIMBRIEF FORMATTING LOGIC
-// Converts standard Lat/Lon (e.g. 51.5, -0.16) into SimBrief format (e.g. 5130N00010W)
-function toSimBriefCoord(lat, lng) {
-    function formatDegree(deg, isLat) {
-        const letter = isLat ? (deg >= 0 ? 'N' : 'S') : (deg >= 0 ? 'E' : 'W');
-        const absolute = Math.abs(deg);
-        const degrees = Math.floor(absolute);
-        const minutes = Math.floor((absolute - degrees) * 60);
-
-        // Latitude uses 2 digits for degrees, Longitude uses 3 digits
-        const padDeg = isLat ? String(degrees).padStart(2, '0') : String(degrees).padStart(3, '0');
-        const padMin = String(minutes).padStart(2, '0');
-        
-        return padDeg + padMin + letter;
-    }
-    return formatDegree(lat, true) + formatDegree(lng, false);
+/* Force the sidebar to the left */
+#sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 350px;
+    background-color: #1e1e24;
+    color: #ffffff;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.9);
+    z-index: 1000; /* Keeps menu above map */
+    overflow-y: auto;
 }
 
-function updateSimBriefOutput() {
-    // Loop through all clicked points, format them, and join them with spaces
-    const outputString = routePoints.map(pt => toSimBriefCoord(pt.lat, pt.lng)).join(' ');
-    document.getElementById('output').value = outputString;
+/* Force the map to fill the remaining space on the right */
+#map {
+    position: absolute;
+    left: 350px; /* Starts exactly where sidebar ends */
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #222; /* Dark fallback color */
+    z-index: 1;
 }
 
+h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    color: #4da6ff;
+    border-bottom: 2px solid #4da6ff;
+    padding-bottom: 10px;
+    text-align: center;
+}
 
-// 5. BUTTON CONTROLS
-document.getElementById('clearRoute').addEventListener('click', () => {
-    routePoints = [];
-    routePolyline.setLatLngs([]);
-    routeMarkers.clearLayers();
-    document.getElementById('output').value = '';
-});
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #2a2a35;
+    padding: 15px;
+    border-radius: 8px;
+}
 
-document.getElementById('clearImage').addEventListener('click', () => {
-    if (imageOverlay) map.removeLayer(imageOverlay);
-    if (topLeftMarker) map.removeLayer(topLeftMarker);
-    if (bottomRightMarker) map.removeLayer(bottomRightMarker);
-    document.getElementById('imageUpload').value = '';
-});
+label { font-weight: bold; color: #4da6ff; }
+.helper-text { font-size: 0.8rem; color: #aaaaaa; margin: 0; }
 
-document.getElementById('copyBtn').addEventListener('click', () => {
-    const copyText = document.getElementById('output');
-    if (copyText.value === '') return;
-    
-    copyText.select();
-    document.execCommand('copy');
-    
-    // Brief visual feedback on the button
-    const btn = document.getElementById('copyBtn');
-    btn.innerText = 'Copied!';
-    btn.style.backgroundColor = '#00ff00';
-    setTimeout(() => {
-        btn.innerText = 'Copy to Clipboard';
-        btn.style.backgroundColor = '#4da6ff';
-    }, 2000);
-});
+button, input[type="file"] {
+    padding: 10px;
+    background-color: #4da6ff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+button:hover { background-color: #3385ff; }
+#clearImage, #clearRoute { background-color: #ff4d4d; color: white; }
+#clearImage:hover, #clearRoute:hover { background-color: #cc0000; }
+
+textarea {
+    resize: none;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #555;
+    background-color: #1a1a1a;
+    color: #00ff00;
+}
