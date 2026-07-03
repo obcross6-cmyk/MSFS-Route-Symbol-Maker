@@ -1,0 +1,96 @@
+/* Removes default browser margins and makes the app full screen */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    background-color: #121212;
+}
+
+/* Sidebar styling for a dark aviation-tool aesthetic */
+#sidebar {
+    width: 350px;
+    background-color: #1e1e24;
+    color: #ffffff;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.8);
+    z-index: 1000; /* Keeps the menu above the map */
+    overflow-y: auto;
+}
+
+#map {
+    flex-grow: 1;
+    height: 100%;
+    background-color: #333;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    color: #4da6ff;
+    border-bottom: 2px solid #4da6ff;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #2a2a35;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+label {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #4da6ff;
+}
+
+.helper-text {
+    font-size: 0.8rem;
+    color: #aaaaaa;
+    margin: 0;
+    line-height: 1.4;
+}
+
+button, input[type="file"] {
+    padding: 10px;
+    background-color: #4da6ff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #3385ff;
+}
+
+#clearImage, #clearRoute {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+#clearImage:hover, #clearRoute:hover {
+    background-color: #cc0000;
+}
+
+textarea {
+    resize: none;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #555;
+    background-color: #1a1a1a;
+    color: #00ff00; /* Green text like an aviation computer */
+}
